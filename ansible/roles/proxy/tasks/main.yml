@@ -1,0 +1,12 @@
+- name: Run HTTPD
+  community.docker.docker_container:
+    name: httpd
+    image: axlz/tp-devops-httpd:latest
+    networks:
+      - name: app-network
+    ports:
+      - "80:80"
+    recreate: yes
+    pull: true
+  vars:
+    ansible_python_interpreter: /opt/docker_venv/bin/python

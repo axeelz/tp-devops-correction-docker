@@ -1,4 +1,4 @@
-name: CD - Build and push Docker images
+name: CD - Build, push and deploy
 on:
   workflow_run:
     workflows:
@@ -10,7 +10,6 @@ on:
 
 jobs:
   build-and-push-docker-image:
-    # only run if CI passed
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-24.04
     steps:
@@ -40,3 +39,28 @@ jobs:
           context: ./http-server
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
           push: true
+
+  deploy:
+    needs: build-and-push-docker-image
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      - name: Install community.docker collection
+        run: ansible-galaxy collection install community.docker
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H axel.zareb.takima.school >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy with Ansible
+        run: ansible-playbook -i ansible/inventories/setup.yml ansible/playbook.yml
