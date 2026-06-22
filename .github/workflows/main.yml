@@ -23,4 +23,4 @@ jobs:
         run: mvn clean verify --file ./simple-api/pom.xml
 
       - name: SonarCloud analysis
-        run: mvn -B verify sonar:sonar -Dsonar.projectKey=axeelz_tp-devops-correction-docker -Dsonar.organization=axeelz -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./simple-api/pom.xml
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=axeelz_tp-devops-correction-docker -Dsonar.organization=axeelz -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${{ secrets.SONAR_TOKEN }} --file ./simple-api/pom.xml
