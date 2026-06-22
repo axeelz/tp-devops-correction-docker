@@ -6,7 +6,7 @@
       - name: app-network
     env:
       DATABASE_HOST: database
-      DATABASE_PASSWORD: pwd
+      DATABASE_PASSWORD: "{{ vault_postgres_password }}"
     recreate: yes
     pull: true
   vars:
