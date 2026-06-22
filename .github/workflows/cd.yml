@@ -56,11 +56,13 @@ jobs:
         run: ansible-galaxy collection install community.docker
 
       - name: Setup SSH key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H axel.zareb.takima.school >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan -t rsa,ed25519 axel.zareb.takima.school >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Deploy with Ansible
-        run: ansible-playbook -i ansible/inventories/setup.yml ansible/playbook.yml
+        run: ansible-playbook -i ansible/inventories/setup.yml ansible/playbook.yml -e 'ansible_ssh_common_args="-o StrictHostKeyChecking=no"'
