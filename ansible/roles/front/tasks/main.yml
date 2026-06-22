@@ -1,0 +1,10 @@
+- name: Run Front
+  community.docker.docker_container:
+    name: front
+    image: axlz/tp-devops-front:latest
+    networks:
+      - name: app-network
+    recreate: yes
+    pull: true
+  vars:
+    ansible_python_interpreter: /opt/docker_venv/bin/python
